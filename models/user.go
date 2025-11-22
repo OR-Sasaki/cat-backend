@@ -17,9 +17,14 @@ type User struct {
 	PasswordHash string `gorm:"not null"`
 }
 
-func GetUser(ctx context.Context, id string) (*User, error) {
+func GetUser(ctx context.Context, id uint) (*User, error) {
 	user, err := gorm.G[User](config.DB).Where("id = ?", id).First(ctx)
 	return &user, err
+}
+
+func (u *User) VerifyPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password))
+	return err == nil
 }
 
 func RegisterUser(ctx context.Context, name string) (user *User, password string, err error) {
