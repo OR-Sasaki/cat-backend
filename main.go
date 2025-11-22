@@ -1,27 +1,33 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"log/slog"
+	"os"
 
-	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+
+	"github.com/OR-Sasaki/cat-backend/config"
+	"github.com/OR-Sasaki/cat-backend/models"
+	"github.com/OR-Sasaki/cat-backend/routers"
 )
 
 func main() {
-	// デフォルトミドルフェアのGinRouterを作成
-	router := gin.Default()
 
-	// シンプルなGETエンドポイントを宣言
-	router.GET("/ping", func(c *gin.Context) {
-		// JSON responseをreturn
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	var err error
+	if config.DB, err = gorm.Open(sqlite.Open(config.DBPath), &gorm.Config{}); err != nil {
+		slog.Error("failed to connect to database", "error", err)
+		os.Exit(1)
+	}
 
-	// ポート8080でサーバーを開始(デフォルト)
-	// サーバーは0.0.0.0:8080をリッスンします
-	if err := router.Run(); err != nil {
-		log.Fatalf("failed to run server: %v", err)
+	if err = models.Migrate(); err != nil {
+		slog.Error("failed to run migration", "error", err)
+		os.Exit(1)
+	}
+
+	router := routers.SetupRouter()
+	if err = router.Run(":" + config.Port); err != nil {
+		slog.Error("failed to start server", "error", err)
+		os.Exit(1)
 	}
 }
