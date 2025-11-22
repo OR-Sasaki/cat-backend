@@ -13,8 +13,8 @@ import (
 
 type User struct {
 	gorm.Model
-	Name         string
-	PasswordHash string
+	Name         string `gorm:"not null"`
+	PasswordHash string `gorm:"not null"`
 }
 
 func GetUser(ctx context.Context, id string) (*User, error) {
@@ -26,7 +26,7 @@ func RegisterUser(ctx context.Context, name string) (user *User, password string
 	password = uuid.New().String()
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
-	if err != nil {
+	if err != nil || len(passwordHash) == 0 {
 		slog.Error("failed to generate password hash", "error", err)
 		return nil, "", err
 	}
