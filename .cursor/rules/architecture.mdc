@@ -75,3 +75,22 @@ This project adopts the following layered structure:
 - Split methods into smaller functions when they exceed 30 lines
 - Use single English words for directory names; use kebab-case when multiple words are necessary
 - Use single English words for file names; use snake_case when multiple words are necessary
+
+### Import Statement Order
+
+Import statements should be organized in the following order, separated by blank lines:
+
+1. **Standard library packages** (e.g., `log/slog`, `os`)
+2. **Third-party packages** (e.g., `gorm.io/driver/sqlite`, `gorm.io/gorm`)
+3. **Project internal packages** (e.g., `github.com/OR-Sasaki/cat-backend/config`, `github.com/OR-Sasaki/cat-backend/models`)
+
+Example:
+```go
+import (
+	"log/slog"
+
+	"gorm.io/gorm"
+
+	"github.com/OR-Sasaki/cat-backend/routers"
+)
+```
