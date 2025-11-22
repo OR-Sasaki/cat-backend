@@ -1,0 +1,77 @@
+---
+alwaysApply: true
+---
+
+# Project Structure and Directory Roles
+
+This project is a web backend API application built with Go.
+It uses Gin as the framework, GORM as the ORM, and SQLite as the database.
+
+## Directory Structure
+
+```
+cat-backend/
+├── main.go                  # Application entry point
+├── go.mod                   # Go module definition file
+├── go.sum                   # Go dependency checksum file
+├── config/                  # Configuration related
+│   ├── database.go          # Database connection instance management
+│   └── environment.go       # Environment variable loading and configuration
+├── models/                  # Database models and business logic
+│   ├── user.go              # User model definition and database operations
+│   └── migrate.go           # Database migration processing
+├── controllers/             # HTTP request handlers
+│   └── users.go             # User-related API endpoint processing
+├── routers/                 # Routing configuration
+│   └── routers.go           # API route definition and setup
+└── db/                      # Database files
+    └── app.db               # SQLite database file
+```
+
+## Role of Each Directory/File
+
+### main.go
+- Application entry point
+- Database connection initialization
+- Migration execution
+- Gin router setup and server startup
+
+### config/
+**Role**: Manage configuration used throughout the application
+- `database.go`: Manage GORM DB instance as a global variable
+- `environment.go`: Load and provide environment variables (port number, DB path, etc.)
+
+### models/
+**Role**: Define database schema and business logic
+- `migrate.go`: Database migration processing (table creation and updates)
+
+### controllers/
+**Role**: Process HTTP requests and generate responses
+
+### routers/
+**Role**: Map API endpoints to handlers
+- `routers.go`: Configure Gin router and bind each endpoint to controllers
+
+### db/
+**Role**: Storage location for database files
+- `app.db`: SQLite database file (holds actual data)
+
+## Architecture Pattern
+
+This project adopts the following layered structure:
+
+1. **Router Layer** (routers/): HTTP routing
+2. **Controller Layer** (controllers/): Request processing and response generation
+3. **Model Layer** (models/): Business logic and database operations
+4. **Configuration Layer** (config/): Common configuration and resource management
+
+## Coding Conventions
+
+- Clearly separate responsibilities for each package
+- Perform appropriate error handling at each layer
+- Use the log/slog package for logging
+- Consolidate database operations in the models layer
+- Implement HTTP handlers in the controllers layer
+- Split methods into smaller functions when they exceed 30 lines
+- Use single English words for directory names; use kebab-case when multiple words are necessary
+- Use single English words for file names; use snake_case when multiple words are necessary
