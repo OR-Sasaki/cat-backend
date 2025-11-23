@@ -12,6 +12,18 @@ import (
 	"github.com/OR-Sasaki/cat-backend/models"
 )
 
+func UsersRouter(router *gin.RouterGroup) {
+	users := router.Group("/users")
+	{
+		users.POST("/register", UserRegister)
+		users.POST("/login", UserLogin)
+	}
+}
+
+// **************************************************
+// UserRegister
+// **************************************************
+
 type UserRegisterRequest struct {
 	Name string `json:"name" binding:"required,min=4,max=20"`
 }
@@ -41,6 +53,10 @@ func UserRegister(c *gin.Context) {
 		Password: password,
 	})
 }
+
+// **************************************************
+// UserLogin
+// **************************************************
 
 type UserLoginRequest struct {
 	ID       uint   `json:"id" binding:"required"`

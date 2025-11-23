@@ -1,0 +1,71 @@
+package controllers
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+
+	"github.com/OR-Sasaki/cat-backend/config"
+	"github.com/OR-Sasaki/cat-backend/models"
+	"github.com/OR-Sasaki/cat-backend/test"
+)
+
+func TestUserRegister(t *testing.T) {
+	testUserLogin(t)
+}
+
+func testUserLogin(t *testing.T) {
+	testDatas := userLoginTestDatas()
+
+	test.TestApi(t, testDatas, "/api/users/login", UsersRouter)
+}
+
+func userLoginTestDatas() []test.TestData[UserLoginResponse] {
+	testDatas := []test.TestData[UserLoginResponse]{}
+
+	{
+		passwordHash, _ := bcrypt.GenerateFromPassword([]byte("testpassworda"), bcrypt.DefaultCost)
+		testDatas = append(testDatas, test.TestData[UserLoginResponse]{
+			Before: func(t *testing.T) {
+				user := models.User{
+					Name:         "testuser",
+					PasswordHash: string(passwordHash),
+				}
+				gorm.G[models.User](config.DB).Create(t.Context(), &user)
+			},
+			Name: "正常系: 有効なidとpasswordでログイン",
+			RequestBody: map[string]interface{}{
+				"id":       1,
+				"password": "testpassword",
+			},
+			ExpectedStatus: http.StatusOK,
+			ValidateResponse: func(t *testing.T, w *httptest.ResponseRecorder, responseBody UserLoginResponse) {
+				assert.NotEmpty(t, responseBody.Token, "トークンは空でない必要があります")
+			},
+		})
+	}
+
+	testDatas = append(testDatas, []test.TestData[UserLoginResponse]{
+		{
+			Name:           "異常系: idが存在しない",
+			RequestBody:    map[string]interface{}{"password": "testpassword"},
+			ExpectedStatus: http.StatusBadRequest,
+		},
+		{
+			Name:           "異常系: passwordが存在しない",
+			RequestBody:    map[string]interface{}{"id": 1},
+			ExpectedStatus: http.StatusBadRequest,
+		},
+		{
+			Name:           "異常系: idとpasswordが存在しない",
+			RequestBody:    map[string]interface{}{},
+			ExpectedStatus: http.StatusBadRequest,
+		},
+	}...)
+
+	return testDatas
+}
