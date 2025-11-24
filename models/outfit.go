@@ -28,12 +28,7 @@ func GetOutfit(ctx context.Context, id uint) (*Outfit, error) {
 	return &outfit, err
 }
 
-func GetAllOutfits(ctx context.Context, seriesID *uint) ([]Outfit, error) {
-	query := gorm.G[Outfit](config.DB)
-	if seriesID != nil {
-		outfits, err := query.Where("series_id = ?", *seriesID).Find(ctx)
-		return outfits, err
-	}
-	outfits, err := query.Find(ctx)
+func GetAllOutfits(ctx context.Context) ([]Outfit, error) {
+	outfits, err := gorm.G[Outfit](config.DB).Find(ctx)
 	return outfits, err
 }

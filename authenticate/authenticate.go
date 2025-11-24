@@ -1,4 +1,4 @@
-package controllers
+package authenticate
 
 import (
 	"errors"

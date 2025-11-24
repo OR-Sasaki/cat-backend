@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/OR-Sasaki/cat-backend/authenticate"
 	"github.com/gin-gonic/gin"
 
 	"github.com/OR-Sasaki/cat-backend/models"
@@ -12,7 +13,7 @@ import (
 func SeriesRouter(router *gin.RouterGroup) {
 	series := router.Group("/series")
 	{
-		series.GET("", GetAllSeries)
+		authenticate.GETWithAuth(series, "", GetAllSeries)
 	}
 }
 
@@ -25,7 +26,7 @@ type SeriesResponse struct {
 	Name string `json:"name"`
 }
 
-func GetAllSeries(c *gin.Context) {
+func GetAllSeries(c *gin.Context, u *models.User) {
 	series, err := models.GetAllSeries(c.Request.Context())
 	if err != nil {
 		slog.Error("failed to get all series", "error", err)

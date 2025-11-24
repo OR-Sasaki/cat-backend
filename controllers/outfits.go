@@ -3,17 +3,17 @@ package controllers
 import (
 	"log/slog"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/OR-Sasaki/cat-backend/authenticate"
 	"github.com/OR-Sasaki/cat-backend/models"
 )
 
 func OutfitsRouter(router *gin.RouterGroup) {
 	outfits := router.Group("/outfits")
 	{
-		outfits.GET("", GetAllOutfits)
+		authenticate.GETWithAuth(outfits, "", GetAllOutfits)
 	}
 }
 
@@ -29,20 +29,8 @@ type OutfitResponse struct {
 	AssetPath string `json:"asset_path"`
 }
 
-func GetAllOutfits(c *gin.Context) {
-	var seriesID *uint
-	if seriesIDParam := c.Query("series_id"); seriesIDParam != "" {
-		id, err := strconv.ParseUint(seriesIDParam, 10, 32)
-		if err != nil {
-			slog.Error("failed to parse series_id", "error", err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": "parameter error"})
-			return
-		}
-		seriesIDValue := uint(id)
-		seriesID = &seriesIDValue
-	}
-
-	outfits, err := models.GetAllOutfits(c.Request.Context(), seriesID)
+func GetAllOutfits(c *gin.Context, u *models.User) {
+	outfits, err := models.GetAllOutfits(c.Request.Context())
 	if err != nil {
 		slog.Error("failed to get all outfits", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})

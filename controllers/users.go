@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/OR-Sasaki/cat-backend/authenticate"
 	"github.com/gin-gonic/gin"
 
 	"github.com/OR-Sasaki/cat-backend/models"
@@ -88,7 +89,7 @@ func UserLogin(c *gin.Context) {
 	}
 
 	// ログイントークンを生成
-	token, err := GenerateAuthenticateToken(user.ID)
+	token, err := authenticate.GenerateAuthenticateToken(user.ID)
 	if err != nil {
 		slog.Error("failed to generate token", "error", err, "id", request.ID)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
