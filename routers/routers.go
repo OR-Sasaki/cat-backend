@@ -12,6 +12,8 @@ func SetupRouter() *gin.Engine {
 	api := router.Group("/api")
 	{
 		controllers.UsersRouter(api)
+		controllers.SeriesRouter(api)
+		controllers.OutfitsRouter(api)
 	}
 
 	return router

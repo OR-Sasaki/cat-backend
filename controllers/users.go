@@ -3,12 +3,9 @@ package controllers
 import (
 	"log/slog"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/OR-Sasaki/cat-backend/config"
 	"github.com/OR-Sasaki/cat-backend/models"
 )
 
@@ -90,18 +87,13 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	// JWTトークンを生成
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		"exp":     time.Now().Add(time.Hour * time.Duration(config.JWTExpirationHours)).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(config.JWTSecret))
+	// ログイントークンを生成
+	token, err := GenerateAuthenticateToken(user.ID)
 	if err != nil {
 		slog.Error("failed to generate token", "error", err, "id", request.ID)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, UserLoginResponse{Token: tokenString})
+	c.JSON(http.StatusOK, UserLoginResponse{Token: token})
 }
