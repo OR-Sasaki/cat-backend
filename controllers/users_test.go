@@ -21,21 +21,22 @@ func TestUserRegister(t *testing.T) {
 func testUserLogin(t *testing.T) {
 	testDatas := userLoginTestDatas()
 
-	test.TestApi(t, testDatas, "/api/users/login", UsersRouter)
+	test.TestApi(t, testDatas, "/api/users/login", UsersRouter, false, "POST")
 }
 
 func userLoginTestDatas() []test.TestData[UserLoginResponse] {
 	testDatas := []test.TestData[UserLoginResponse]{}
 
 	{
-		passwordHash, _ := bcrypt.GenerateFromPassword([]byte("testpassworda"), bcrypt.DefaultCost)
+		passwordHash, _ := bcrypt.GenerateFromPassword([]byte("testpassword"), bcrypt.DefaultCost)
 		testDatas = append(testDatas, test.TestData[UserLoginResponse]{
-			Before: func(t *testing.T) {
+			Before: func(t *testing.T, _ *models.User) map[string]any {
 				user := models.User{
 					Name:         "testuser",
 					PasswordHash: string(passwordHash),
 				}
 				gorm.G[models.User](config.DB).Create(t.Context(), &user)
+				return nil
 			},
 			Name: "正常系: 有効なidとpasswordでログイン",
 			RequestBody: map[string]interface{}{
