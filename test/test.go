@@ -21,7 +21,7 @@ import (
 type TestData[T any] struct {
 	Before           func(*testing.T, *models.User) map[string]any
 	Name             string
-	RequestBody      func(params map[string]any) map[string]any
+	RequestBody      interface{}
 	ExpectedStatus   int
 	ValidateResponse func(t *testing.T, response *httptest.ResponseRecorder, responseBody T)
 }
@@ -53,13 +53,15 @@ func TestApi[T any](
 				user, _, _ = models.RegisterUser(t.Context(), "testuser")
 			}
 
-			beforeParams := make(map[string]any)
+			var beforeParams map[string]any
 
 			if tt.Before != nil {
 				beforeParams = tt.Before(t, user)
 			}
 
-			req := createTestRequest(t, method, urlPath, tt.RequestBody(beforeParams))
+			requestBody := resolveRequestBody(tt.RequestBody, beforeParams)
+
+			req := createTestRequest(t, method, urlPath, requestBody)
 
 			if useAuth {
 				setAuthHeader(req, user)
@@ -71,8 +73,15 @@ func TestApi[T any](
 			assert.Equal(t, tt.ExpectedStatus, w.Code)
 
 			var responseBody T
-			if err := json.Unmarshal(w.Body.Bytes(), &responseBody); err != nil {
-				t.Fatalf("レスポンスのアンマーシャルに失敗しました: %v", err)
+			shouldUnmarshal := w.Code >= http.StatusOK && w.Code < http.StatusMultipleChoices
+			if !shouldUnmarshal && tt.ValidateResponse != nil {
+				shouldUnmarshal = true
+			}
+
+			if shouldUnmarshal {
+				if err := json.Unmarshal(w.Body.Bytes(), &responseBody); err != nil {
+					t.Fatalf("レスポンスのアンマーシャルに失敗しました: %v", err)
+				}
 			}
 
 			if tt.ValidateResponse != nil {
@@ -145,4 +154,19 @@ func createTestRequest(t *testing.T, method, urlPath string, requestBody interfa
 func setAuthHeader(req *http.Request, user *models.User) {
 	token, _ := authenticate.GenerateAuthenticateToken(user.ID)
 	req.Header.Set("Authorization", "Bearer "+token)
+}
+
+func resolveRequestBody(body interface{}, params map[string]any) interface{} {
+	if body == nil {
+		return nil
+	}
+
+	switch supplier := body.(type) {
+	case func(map[string]any) interface{}:
+		return supplier(params)
+	case func() interface{}:
+		return supplier()
+	default:
+		return body
+	}
 }

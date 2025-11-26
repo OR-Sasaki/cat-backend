@@ -33,8 +33,7 @@ func POSTWithAuth(routerGroup *gin.RouterGroup, path string, handler func(*gin.C
 }
 
 type authenticateClaims struct {
-	userID uint      `json:"user_id"`
-	exp    time.Time `json:"exp"`
+	UserID uint `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
@@ -47,7 +46,8 @@ func Authenticate(c *gin.Context) (*models.User, error) {
 	headerToken = strings.TrimPrefix(headerToken, "Bearer ")
 
 	// 1. JWTトークンを検証
-	parsedToken, err := jwt.Parse(headerToken, func(t *jwt.Token) (any, error) {
+	claims := &authenticateClaims{}
+	parsedToken, err := jwt.ParseWithClaims(headerToken, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
@@ -58,13 +58,8 @@ func Authenticate(c *gin.Context) (*models.User, error) {
 	}
 
 	// 2. トークンからユーザーIDを取得
-	claims, ok := parsedToken.Claims.(authenticateClaims)
-	if !ok {
-		return nil, errors.New("token is not a authenticateClaims")
-	}
-
 	// 3. ユーザーIDを使用してユーザーを取得
-	user, err := models.GetUser(c.Request.Context(), claims.userID)
+	user, err := models.GetUser(c.Request.Context(), claims.UserID)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
@@ -74,9 +69,13 @@ func Authenticate(c *gin.Context) (*models.User, error) {
 }
 
 func GenerateAuthenticateToken(userID uint) (string, error) {
+	expiration := time.Now().Add(time.Hour * time.Duration(config.JWTExpirationHours))
 	claims := authenticateClaims{
-		userID: userID,
-		exp:    time.Now().Add(time.Hour * time.Duration(config.JWTExpirationHours)),
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiration),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

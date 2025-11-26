@@ -29,6 +29,5 @@ func GetOutfit(ctx context.Context, id uint) (*Outfit, error) {
 }
 
 func GetAllOutfits(ctx context.Context) ([]Outfit, error) {
-	outfits, err := gorm.G[Outfit](config.DB).Find(ctx)
-	return outfits, err
+	return gorm.G[Outfit](config.DB).Find(ctx)
 }
