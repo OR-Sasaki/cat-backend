@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  cat-backend:
+    build:
+      context: ../..
+      dockerfile: docker/local/Dockerfile
+    container_name: cat-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DB_PATH=db/app.db
+    volumes:
+      - ../../db:/app/db
+    restart: unless-stopped
+
