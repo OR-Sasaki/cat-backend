@@ -1,0 +1,86 @@
+basePath: /api
+definitions:
+  controllers.UserLoginRequest:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+    required:
+    - id
+    - password
+    type: object
+  controllers.UserLoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  controllers.UserRegisterRequest:
+    properties:
+      name:
+        maxLength: 20
+        minLength: 4
+        type: string
+    required:
+    - name
+    type: object
+  controllers.UserRegisterResponse:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Description for what is this security definition being used
+  title: CAT Backend
+  version: "1.0"
+paths:
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: 'IDとパスワードで認証し、JWTトークンを返す。このJWTトークンは Authorization: Bearer <token>
+        としてヘッダーに付加してください。'
+      parameters:
+      - description: ユーザーログインリクエスト
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.UserLoginResponse'
+      summary: ユーザーログイン
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: 新規ユーザーを登録し、IDとパスワードを返す
+      parameters:
+      - description: ユーザー登録リクエスト
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UserRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.UserRegisterResponse'
+      summary: ユーザー登録
+      tags:
+      - users
+swagger: "2.0"

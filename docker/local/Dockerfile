@@ -13,6 +13,10 @@ RUN go mod download
 # ソースコードをコピー
 COPY . .
 
+# Swaggerを更新
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init
+
 # バイナリをビルド
 RUN CGO_ENABLED=1 GOOS=linux go build -o /app/cat-backend ./main.go
 

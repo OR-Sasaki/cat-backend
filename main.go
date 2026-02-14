@@ -1,5 +1,15 @@
 package main
 
+//	@title		CAT Backend
+//	@version	1.0
+//	@host		localhost:8080
+//	@BasePath	/api
+
+//	@securityDefinitions.apikey	JTW
+//	@in							header
+//	@name						Authorization
+//	@description				Bearer: に続いてトークンを入力してください
+
 import (
 	"log/slog"
 	"os"
