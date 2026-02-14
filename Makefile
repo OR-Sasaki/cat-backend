@@ -11,3 +11,5 @@ up:
 down:
 	$(DOCKER_COMPOSE) down
 
+app:
+	$(DOCKER_COMPOSE) exec cat-backend sh
