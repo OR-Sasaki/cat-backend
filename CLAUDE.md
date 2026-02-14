@@ -12,7 +12,7 @@ APIハンドラ関数（`func XxxHandler(c *gin.Context)` など）を定義す�
 // @Produce json
 // @Param request body UserRegisterRequest true "ユーザー登録リクエスト"
 // @Success 200 {object} UserRegisterResponse
-// @Router /users/register [post]
+// @Router /api/users/register [post]
 func UserRegister(c *gin.Context) {
 ```
 
@@ -23,7 +23,7 @@ func UserRegister(c *gin.Context) {
 - `@Accept` / `@Produce` - リクエスト/レスポンスのContent-Type
 - `@Param` - リクエストパラメータ（body, query, path など）
 - `@Success` - レスポンスのステータスコードと型(@Failureの場合は記載しない)
-- `@Router` - エンドポイントのパスとHTTPメソッド
+- `@Router` - エンドポイントのパスとHTTPメソッド(基本的に/apiから始まる)
 
 認証が必要なエンドポイントには `@Security` も追加すること:
 ```go

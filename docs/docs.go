@@ -15,6 +15,34 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/outfits": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "全ての衣装情報を取得する",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "outfits"
+                ],
+                "summary": "全衣装取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/controllers.OutfitResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "description": "IDとパスワードで認証し、JWTトークンを返す。このJWTトークンは Authorization: Bearer \u003ctoken\u003e としてヘッダーに付加してください。",
@@ -85,6 +113,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controllers.OutfitResponse": {
+            "type": "object",
+            "properties": {
+                "asset_path": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "series_id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "controllers.UserLoginRequest": {
             "type": "object",
             "required": [
@@ -132,6 +180,14 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "JTW": {
+            "description": "Bearer: に続いてトークンを入力してください",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -142,7 +198,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "CAT Backend",
-	Description:      "Description for what is this security definition being used",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

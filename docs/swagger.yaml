@@ -1,5 +1,18 @@
 basePath: /api
 definitions:
+  controllers.OutfitResponse:
+    properties:
+      asset_path:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      series_id:
+        type: integer
+      type:
+        type: string
+    type: object
   controllers.UserLoginRequest:
     properties:
       id:
@@ -34,10 +47,26 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: Description for what is this security definition being used
   title: CAT Backend
   version: "1.0"
 paths:
+  /api/outfits:
+    get:
+      description: 全ての衣装情報を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.OutfitResponse'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: 全衣装取得
+      tags:
+      - outfits
   /users/login:
     post:
       consumes:
@@ -83,4 +112,10 @@ paths:
       summary: ユーザー登録
       tags:
       - users
+securityDefinitions:
+  JTW:
+    description: 'Bearer: に続いてトークンを入力してください'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

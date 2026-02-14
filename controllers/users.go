@@ -31,14 +31,14 @@ type UserRegisterResponse struct {
 	Password string `json:"password"`
 }
 
-// @Summary		ユーザー登録
-// @Description	新規ユーザーを登録し、IDとパスワードを返す
-// @Tags			users
-// @Accept			json
-// @Produce		json
-// @Param			request	body		UserRegisterRequest	true	"ユーザー登録リクエスト"
-// @Success		200		{object}	UserRegisterResponse
-// @Router			/users/register [post]
+// @Summary ユーザー登録
+// @Description 新規ユーザーを登録し、IDとパスワードを返す
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body UserRegisterRequest true "ユーザー登録リクエスト"
+// @Success 200 {object} UserRegisterResponse
+// @Router /api/users/register [post]
 func UserRegister(c *gin.Context) {
 	var request UserRegisterRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -73,14 +73,14 @@ type UserLoginResponse struct {
 	Token string `json:"token"`
 }
 
-// @Summary		ユーザーログイン
-// @Description	IDとパスワードで認証し、JWTトークンを返す。このJWTトークンは Authorization: Bearer <token> としてヘッダーに付加してください。
-// @Tag			users
-// @Accep			json
-// @Produce		json
-// @Param			request	body		UserLoginRequest	true	"ユーザーログインリクエスト"
-// @Success		200		{object}	UserLoginResponse
-// @Router			/users/login [post]
+// @Summary ユーザーログイン
+// @Description IDとパスワードで認証し、JWTトークンを返す。このJWTトークンは Authorization: Bearer <token> としてヘッダーに付加してください。
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body UserLoginRequest true "ユーザーログインリクエスト"
+// @Success 200 {object} UserLoginResponse
+// @Router /api/users/login [post]
 func UserLogin(c *gin.Context) {
 	var request UserLoginRequest
 	if err := c.ShouldBindJSON(&request); err != nil {

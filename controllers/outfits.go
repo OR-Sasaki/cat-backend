@@ -29,6 +29,13 @@ type OutfitResponse struct {
 	AssetPath string `json:"asset_path"`
 }
 
+// @Summary 全衣装取得
+// @Description 全ての衣装情報を取得する
+// @Tags outfits
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} OutfitResponse
+// @Router /api/outfits [get]
 func GetAllOutfits(c *gin.Context, u *models.User) {
 	outfits, err := models.GetAllOutfits(c.Request.Context())
 	if err != nil {
