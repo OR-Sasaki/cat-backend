@@ -18,7 +18,9 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init
 
 # バイナリをビルド
-RUN CGO_ENABLED=1 GOOS=linux go build -o /app/cat-backend ./main.go
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    CGO_ENABLED=1 GOOS=linux go build -o /app/cat-backend ./main.go
 
 # 実行ステージ
 FROM alpine:latest
