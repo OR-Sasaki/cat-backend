@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	Port               = fetchString("PORT", "8080")
+	Port               = fetchString("PORT", "8040")
 	DBPath             = fetchString("DB_PATH", "db/app.db")
 	JWTSecret          = fetchString("JWT_SECRET", "your-secret-key-change-in-production")
 	JWTExpirationHours = fetchInt("JWT_EXPIRATION_HOURS", 24)
